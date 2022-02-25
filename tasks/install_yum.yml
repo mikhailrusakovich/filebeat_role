@@ -1,7 +1,22 @@
 ---
-- name: Install Elasticsearch
+- name: Install Filebeat
   become: true
   yum:
-    name: "/tmp/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+    name: "/tmp/filebeat-{{ filebeat_version }}-x86_64.rpm"
     state: present
-  notify: restart Elasticsearch
+  notify: restart filebeat
+- name: Set filebeat systemwork
+  become: true
+  command:
+    cmd: filebeat modules enable system
+    chdir: /usr/share/filebeat/bin
+  register: filebeat_modules
+  changed_when: filebeat_modules.stdout != 'Module system is already enable!'
+- name: Load Kibana dashboard
+  become: true
+  command:
+    cmd: filebeat setup
+    chdir: /usr/share/filebeat/bin
+  register: filebeat_setup
+  changed_when: false
+  until: filebeat_setup is succeeded
