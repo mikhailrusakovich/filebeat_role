@@ -1,5 +1,5 @@
 ---
-- name: restart Filebeat
+- name: restart filebeat
   become: true
   systemd:
     name: filebeat
